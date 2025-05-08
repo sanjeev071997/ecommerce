@@ -13,10 +13,7 @@ yarn-error.log*
 
 # testing
 /coverage
-
-# production
-/build
-
+.text.txt
 # misc
 .DS_Store
 Thumbs.db
