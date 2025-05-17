@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import User from "../models/user.js";
 import sendToken from "../utils/jwtToken.js";
-import ErrorHandler from "../utils/errorhandler.js";
+import Errorhandler from "../utils/Errorhandler.js";
 import catchAsyncErrors from "../middlewares/catchAsyncErrors.js";
 import logger from "../config/logger.js";
 import sendEmail from "../utils/sendEmail.js";
@@ -12,7 +12,7 @@ export const register = catchAsyncErrors(async (req, res, next) => {
   const { name, email, phone, password } = req.body;
   const userExist = await User.findOne({ email });
   if (userExist) {
-    return next(new ErrorHandler("Email already registered", 400));
+    return next(new Errorhandler("Email already registered", 400));
   }
   try {
     // Create a new user
@@ -25,7 +25,7 @@ export const register = catchAsyncErrors(async (req, res, next) => {
     sendToken(user, 200, res);
   } catch (error) {
     logger.error(error);
-    return next(new ErrorHandler(error.message, 500));
+    return next(new Errorhandler(error.message, 500));
   }
 });
 
@@ -43,18 +43,18 @@ export const login = catchAsyncErrors(async (req, res, next) => {
     }).select("+password");
 
     if (!user) {
-      return next(new ErrorHandler("Invalid email or password", 401));
+      return next(new Errorhandler("Invalid email or password", 401));
     }
 
     const isPasswordMatched = await user.comparePassword(password);
 
     if (!isPasswordMatched) {
-      return next(new ErrorHandler("Invalid email or password", 401));
+      return next(new Errorhandler("Invalid email or password", 401));
     }
     sendToken(user, 200, res);
   } catch (error) {
     logger.error(error);
-    return next(new ErrorHandler(error.message, 500));
+    return next(new Errorhandler(error.message, 500));
   }
 });
 
@@ -77,7 +77,7 @@ export const profileDetails = catchAsyncErrors(async (req, res, next) => {
     const user = await User.findById(req.user.id).select("-password");
 
     if (!user) {
-      return next(new ErrorHandler("User not found!", 404));
+      return next(new Errorhandler("User not found!", 404));
     }
     res.status(200).json({
       success: true,
@@ -86,7 +86,7 @@ export const profileDetails = catchAsyncErrors(async (req, res, next) => {
     });
   } catch (error) {
     logger.error(error);
-    return next(new ErrorHandler(error.message, 500));
+    return next(new Errorhandler(error.message, 500));
   }
 });
 
@@ -112,7 +112,7 @@ export const profileUpdate = catchAsyncErrors(async (req, res, next) => {
     });
   } catch (error) {
     logger.error(error);
-    return next(new ErrorHandler(error.message, 500));
+    return next(new Errorhandler(error.message, 500));
   }
 });
 
@@ -123,31 +123,31 @@ export const profileUpdatePassword = async (req, res, next) => {
 
     const isPasswordMatched = await user.comparePassword(req.body.oldPassword);
     if (!isPasswordMatched) {
-      return next(new ErrorHandler("Old password is incorrect", 400));
+      return next(new Errorhandler("Old password is incorrect", 400));
     }
 
     if (req.body.newPassword !== req.body.confirmPassword) {
-      return next(new ErrorHandler("Password does not match", 400));
+      return next(new Errorhandler("Password does not match", 400));
     }
     user.password = req.body.newPassword;
     await user.save();
     sendToken(user, 200, res);
   } catch (error) {
     logger.error(error);
-    return next(new ErrorHandler(error.message, 500));
+    return next(new Errorhandler(error.message, 500));
   }
 };
 
 // user forgot password
 export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
   if (!req.body.email) {
-    return next(new ErrorHandler("Please Enter Your Email", 400));
+    return next(new Errorhandler("Please Enter Your Email", 400));
   }
   
   let user = await User.findOne({ email: req.body.email });
 
   if (!user) {
-    return next(new ErrorHandler("User not found", 404));
+    return next(new Errorhandler("User not found", 404));
   }
 
   // Get ResetPassword Token
@@ -156,7 +156,7 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
     resetToken = user.getResetPasswordToken();
   } else {
     return next(
-      new ErrorHandler(
+      new Errorhandler(
         "Reset password token function not available for this user",
         500
       )
@@ -189,7 +189,7 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
     user.resetPasswordExpire = undefined;
     await user.save({ validateBeforeSave: false });
     logger.error(error);
-    return next(new ErrorHandler(error.message, 500));
+    return next(new Errorhandler(error.message, 500));
   }
 });
 
@@ -209,7 +209,7 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
 
     if (!user) {
       return next(
-        new ErrorHandler(
+        new Errorhandler(
           "Reset Password Token is invalid or has been expired",
           400
         )
@@ -217,7 +217,7 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
     }
     // Check if passwords match
     if (req.body.password !== req.body.confirmPassword) {
-      return next(new ErrorHandler("Password does not match", 400));
+      return next(new Errorhandler("Password does not match", 400));
     }
     user.password = req.body.password;
     user.resetPasswordToken = undefined;
@@ -226,6 +226,6 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
     sendToken(user, 200, res);
   } catch (error) {
     logger.error(error);
-    return next(new ErrorHandler(error.message, 500));
+    return next(new Errorhandler(error.message, 500));
   }
 });

@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import Cart from '../models/cart.js';
 import Product from '../models/product.js';
 import catchAsyncErrors from '../middlewares/catchAsyncErrors.js';
-import ErrorHandler from '../utils/errorhandler.js';
+import Errorhandler from '../utils/Errorhandler.js';
 import logger from '../config/logger.js';
 
 // Add product to cart
@@ -31,7 +31,7 @@ import logger from '../config/logger.js';
 //     res.status(200).json({ success: true, message: 'Item added to cart', data: cart });
 //   } catch (error) {
 //     logger.error(error);
-//     return next(new ErrorHandler(error.message, 500));
+//     return next(new Errorhandler(error.message, 500));
 //   }
 // });
 
@@ -77,7 +77,7 @@ export const addToCart = catchAsyncErrors(async (req, res, next) => {
     });
   } catch (error) {
     console.error(error); // or logger.error(error)
-    return next(new ErrorHandler(error.message, 500));
+    return next(new Errorhandler(error.message, 500));
   }
 });
 
@@ -96,7 +96,7 @@ export const getCart = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({ success: true, data: cart });
   } catch (error) {
     logger.error(error);
-    return next(new ErrorHandler(error.message, 500));
+    return next(new Errorhandler(error.message, 500));
   }
 });
 
@@ -106,17 +106,17 @@ export const updateCartItem = catchAsyncErrors(async (req, res, next) => {
 
   try {
     const cart = await Cart.findOne({ user: req.user.id });
-    if (!cart) return next(new ErrorHandler('Cart not found', 404));
+    if (!cart) return next(new Errorhandler('Cart not found', 404));
 
     const item = cart.items.find(item => item.product.toString() === productId);
-    if (!item) return next(new ErrorHandler('Item not found in cart', 404));
+    if (!item) return next(new Errorhandler('Item not found in cart', 404));
 
     item.quantity = quantity;
     await cart.save();
     res.status(200).json({ success: true, message: 'Quantity updated', data: cart });
   } catch (error) {
     logger.error(error);
-    return next(new ErrorHandler(error.message, 500));
+    return next(new Errorhandler(error.message, 500));
   }
 });
 
@@ -126,14 +126,14 @@ export const removeCartItem = catchAsyncErrors(async (req, res, next) => {
 
   try {
     const cart = await Cart.findOne({ user: req.user.id });
-    if (!cart) return next(new ErrorHandler('Cart not found', 404));
+    if (!cart) return next(new Errorhandler('Cart not found', 404));
 
     cart.items = cart.items.filter(item => item.product.toString() !== productId);
     await cart.save();
     res.status(200).json({ success: true, message: 'Item removed', data: cart });
   } catch (error) {
     logger.error(error);
-    return next(new ErrorHandler(error.message, 500));
+    return next(new Errorhandler(error.message, 500));
   }
 });
 
@@ -141,13 +141,13 @@ export const removeCartItem = catchAsyncErrors(async (req, res, next) => {
 export const clearCart = catchAsyncErrors(async (req, res, next) => {
   try {
     const cart = await Cart.findOne({ user: req.user.id });
-    if (!cart) return next(new ErrorHandler('Cart not found', 404));
+    if (!cart) return next(new Errorhandler('Cart not found', 404));
 
     cart.items = [];
     await cart.save();
     res.status(200).json({ success: true, message: 'Cart cleared' });
   } catch (error) {
     logger.error(error);
-    return next(new ErrorHandler(error.message, 500));
+    return next(new Errorhandler(error.message, 500));
   }
 });

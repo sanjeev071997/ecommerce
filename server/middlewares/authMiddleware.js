@@ -1,4 +1,4 @@
-import Errorhandler from "../utils/errorhandler.js";
+import Errorhandler from "../utils/Errorhandler.js";
 import catchAsyncErrors from "./catchAsyncErrors.js";
 import jwt from 'jsonwebtoken'
 import User from "../models/user.js";
@@ -29,7 +29,7 @@ export const isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
 
 // Admin 
 export const isAdmin = catchAsyncErrors (async(req, res, next) => {
-    if (req.user.role != 1) { // not equal admin
+    if (req?.user?.role != 1) { // not equal admin
       return next(new Errorhandler('Access denied, you must an Only Admin', 403));
     }
     next();

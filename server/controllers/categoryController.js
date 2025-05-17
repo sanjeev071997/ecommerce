@@ -1,6 +1,6 @@
 import Category from "../models/category.js";
 import catchAsyncErrors from "../middlewares/catchAsyncErrors.js";
-import ErrorHandler from "../utils/errorhandler.js";
+import Errorhandler from "../utils/Errorhandler.js";
 import logger from "../config/logger.js";
 
 // Create Category
@@ -15,7 +15,7 @@ export const createCategory = catchAsyncErrors(async (req, res, next) => {
     });
   } catch (error) {
     logger.error(error);
-    return next(new ErrorHandler(error.message, 500));
+    return next(new Errorhandler(error.message, 500));
   }
 });
 
@@ -29,7 +29,7 @@ export const getAllCategories = catchAsyncErrors(async (req, res, next) => {
     });
   } catch (error) {
     logger.error(error);
-    return next(new ErrorHandler(error.message, 500));
+    return next(new Errorhandler(error.message, 500));
   }
 });
 
@@ -38,7 +38,7 @@ export const getCategoryById = catchAsyncErrors(async (req, res, next) => {
   try {
     const category = await Category.findById(req.params.id);
     if (!category) {
-      return next(new ErrorHandler("Category not found", 404));
+      return next(new Errorhandler("Category not found", 404));
     }
     res.status(200).json({
       success: true,
@@ -46,7 +46,7 @@ export const getCategoryById = catchAsyncErrors(async (req, res, next) => {
     });
   } catch (error) {
     logger.error(error);
-    return next(new ErrorHandler(error.message, 500));
+    return next(new Errorhandler(error.message, 500));
   }
 });
 
@@ -57,7 +57,7 @@ export const updateCategory = catchAsyncErrors(async (req, res, next) => {
       new: true,
     });
     if (!category) {
-      return next(new ErrorHandler("Category not found", 404));
+      return next(new Errorhandler("Category not found", 404));
     }
     res.status(200).json({
       success: true,
@@ -66,7 +66,7 @@ export const updateCategory = catchAsyncErrors(async (req, res, next) => {
     });
   } catch (error) {
     logger.error(error);
-    return next(new ErrorHandler(error.message, 500));
+    return next(new Errorhandler(error.message, 500));
   }
 });
 
@@ -75,7 +75,7 @@ export const deleteCategory = catchAsyncErrors(async (req, res, next) => {
   try {
     const category = await Category.findByIdAndDelete(req.params.id);
     if (!category) {
-      return next(new ErrorHandler("Category not found", 404));
+      return next(new Errorhandler("Category not found", 404));
     }
     res.status(200).json({
       success: true,
@@ -83,6 +83,6 @@ export const deleteCategory = catchAsyncErrors(async (req, res, next) => {
     });
   } catch (error) {
     logger.error(error);
-    return next(new ErrorHandler(error.message, 500));
+    return next(new Errorhandler(error.message, 500));
   }
 });
